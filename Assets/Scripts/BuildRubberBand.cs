@@ -8,48 +8,52 @@ public class BuildRubberBand : MonoBehaviour
     public GameObject startCircle;
     public GameObject endCircle;
     public GameObject middleCircle;
+    public GameObject lineRenderer;
     public int numberOfPoints;
 
     private GameObject[] points;
+    private GameObject line;
 
     // Start is called before the first frame update
     void Start()
     {
-        points = new GameObject[numberOfPoints-1];
+        points = new GameObject[numberOfPoints+2];
 
         Vector3 startPos = startCircle.transform.position;
         Vector3 endPos = endCircle.transform.position;
         Vector3 distanceBetweenStartAndEnd = endPos - startPos;
-        Vector3 distanceBetweenEachPoint = distanceBetweenStartAndEnd / numberOfPoints;
+        Vector3 distanceBetweenEachPoint = distanceBetweenStartAndEnd / (numberOfPoints+1);
 
         //build the points
         for (int i=0; i<points.Length; i++) {
-            points[i] = Instantiate(middleCircle,startPos + (i+1)*distanceBetweenEachPoint,Quaternion.identity);
-            points[i].transform.SetParent(this.gameObject.transform);
-        }
-
-        //set the springs and lines
-        LineFollowBallPositions lineScript;
-        SpringJoint2D springJoint;
-
-        lineScript = startCircle.GetComponent<LineFollowBallPositions>();
-        springJoint = startCircle.GetComponent<SpringJoint2D>();
-        lineScript.nextBall = points[0].transform;
-        springJoint.connectedBody = points[0].GetComponent<Rigidbody2D>();
-
-        for (int i = 0; i < points.Length; i++){
-            lineScript = points[i].GetComponent<LineFollowBallPositions>();
-            springJoint = points[i].GetComponent<SpringJoint2D>();
-
-            if (i == points.Length-1){//last point
-                lineScript.nextBall = endCircle.transform;
-                springJoint.connectedBody = endCircle.GetComponent<Rigidbody2D>();
+            if (i==0) {
+                points[i] = startCircle;
+                continue;
             }
-            else{
-                lineScript.nextBall = points[i+1].transform;
-                springJoint.connectedBody = points[i+1].GetComponent<Rigidbody2D>();
-            }        
+            if (i==points.Length-1) {
+                points[i] = endCircle;
+                continue;
+            }
+            points[i] = Instantiate(middleCircle,startPos + i*distanceBetweenEachPoint,Quaternion.identity);
+            points[i].transform.SetParent(this.gameObject.transform);
+            points[i].transform.SetSiblingIndex(i);
         }
+
+            line = Instantiate(lineRenderer);
+            line.transform.SetParent(this.gameObject.transform);
+        
+
+
+        //set the points springs
+        SpringJoint2D springJoint;
+        for (int i = 0; i < points.Length-1; i++)
+        {
+            springJoint = points[i].GetComponent<SpringJoint2D>();
+            springJoint.connectedBody = points[i + 1].GetComponent<Rigidbody2D>();
+            springJoint.distance = distanceBetweenEachPoint.magnitude/1.5f;
+        }
+
+        
     }
 
     // Update is called once per frame
