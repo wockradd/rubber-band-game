@@ -45,12 +45,18 @@ public class LineFollowBallPositions : MonoBehaviour
         }
 
         Vector3[] points3d = new Vector3[lr.positionCount];
-        Vector2[] points2d = new Vector2[lr.positionCount];
-
+        Vector2[] points2d = new Vector2[lr.positionCount*2];
         lr.GetPositions(points3d);
-        for (int i=0; i<points2d.Length; i++) {
 
-                points2d[i] = new Vector2(points3d[i].x, points3d[i].y);
+        for (int i=0; i<points2d.Length; i++) {
+            if (i < points3d.Length)
+            {
+                points2d[i] = new Vector2(points3d[i].x, points3d[i].y-0.2f);
+            }
+            else {
+                points2d[i] = new Vector2(points3d[points3d.Length- 1-i%points3d.Length].x, points3d[points3d.Length - 1-i % points3d.Length].y + 0.2f);
+            }
+                
             
             
         }
