@@ -49,12 +49,17 @@ public class LineFollowBallPositions : MonoBehaviour
         lr.GetPositions(points3d);
 
         for (int i=0; i<points2d.Length; i++) {
+            //offset so the hitbox doesnt overlap with first or last point 
+            float offset = 0;
+            if (i==0 || i==points2d.Length-1)  offset = 0.3f;
+            if (i == points3d.Length-1 || i == points3d.Length) offset = -0.3f;
+
             if (i < points3d.Length)
             {
-                points2d[i] = new Vector2(points3d[i].x, points3d[i].y-0.2f);
+                points2d[i] = new Vector2(points3d[i].x + offset, points3d[i].y-0.2f);
             }
             else {
-                points2d[i] = new Vector2(points3d[points3d.Length- 1-i%points3d.Length].x, points3d[points3d.Length - 1-i % points3d.Length].y + 0.2f);
+                points2d[i] = new Vector2(points3d[points3d.Length- 1-i%points3d.Length].x + offset, points3d[points3d.Length - 1-i % points3d.Length].y + 0.2f);
             }
                 
             
